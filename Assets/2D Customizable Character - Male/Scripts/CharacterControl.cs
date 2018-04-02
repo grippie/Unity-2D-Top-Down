@@ -8,31 +8,51 @@ public class CharacterControl : MonoBehaviour
 
     public GameObject downDir, upDir, leftDir, rightDir;
     public GameObject currentDir;
-    public float speed = 7;
+    public float speed;
     public bool isWalking;
     public float horizontal, vertical;
+    public Camera cam;
+    public float x, y, z;
  
     // Use this for initialization
     void Start()
     {
+
         if (currentDir == null)
-            currentDir = downDir;
+        {
+            if (downDir.activeSelf)
+                currentDir = downDir;
+            else if (upDir.activeSelf)
+                currentDir = upDir;
+            else if(rightDir.activeSelf)
+                currentDir = rightDir;
+            else if(leftDir.activeSelf)
+                currentDir = leftDir;
+        }
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Vector2 moveDirection = Vector2.zero;
-        //currentDirAnim = currentDir.GetComponent<Animator>();
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
         isWalking = false;
 
+        x = cam.transform.position.x;
+        y = cam.transform.position.y;
+        z = cam.transform.position.z;
+
+        moveDirection.x = horizontal;
+        moveDirection.y = vertical;
+
+        if (Mathf.Abs(horizontal) > 0 || Mathf.Abs(vertical) > 0)
+            isWalking = true;
+        else
+            isWalking = false;
+
         if (horizontal < 0)
         {
-            isWalking = true;
-            moveDirection.x = horizontal;
-
             if (!currentDir.Equals(leftDir) || currentDir.GetComponent<Animator>().GetBool("Idle"))
             {
                 currentDir.SetActive(false);
@@ -40,14 +60,11 @@ public class CharacterControl : MonoBehaviour
                 currentDir.SetActive(true);
                 currentDir.GetComponent<Animator>().Play(0);
                 currentDir.GetComponent<Animator>().SetBool("Idle", false);
-            }  
+            }
         }
-        else if (vertical > 0)
+        if (vertical > 0)
         {
-            isWalking = true;
-            moveDirection.y = 1;
-
-            if (!currentDir.Equals(upDir))
+            if (!currentDir.Equals(upDir) || currentDir.GetComponent<Animator>().GetBool("Idle"))
             {
                 currentDir.SetActive(false);
                 currentDir = upDir;
@@ -58,10 +75,7 @@ public class CharacterControl : MonoBehaviour
         }
         else if (horizontal > 0)
         {
-            isWalking = true;
-            moveDirection.x = 1;
-
-            if (!currentDir.Equals(rightDir))
+            if (!currentDir.Equals(rightDir) || currentDir.GetComponent<Animator>().GetBool("Idle"))
             {
                 currentDir.SetActive(false);
                 currentDir = rightDir;
@@ -69,13 +83,14 @@ public class CharacterControl : MonoBehaviour
                 currentDir.GetComponent<Animator>().Play(0);
                 currentDir.GetComponent<Animator>().SetBool("Idle", false);
             }
+            else
+            {
+                currentDir = rightDir;
+            }
         }
         else if (vertical < 0)
         {
-            isWalking = true;
-            moveDirection.y = -1;
-
-            if (currentDir != downDir)
+            if (!currentDir.Equals(downDir) || currentDir.GetComponent<Animator>().GetBool("Idle"))
             {
                 currentDir.SetActive(false);
                 currentDir = downDir;
