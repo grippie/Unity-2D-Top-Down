@@ -249,6 +249,7 @@
     <Compile Include="Assets\2D Customizable Character - Male\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\2D Customizable Character - Male\Scripts\CharacterControl.cs" />
     <Compile Include="Assets\2D Customizable Character - Male\Scripts\CharacterSetup.cs" />
+    <Compile Include="Assets\2D Customizable Character - Male\Scripts\TilemapInfo.cs" />
     <Compile Include="Assets\Scripts\AnimatedTile.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
   </ItemGroup>

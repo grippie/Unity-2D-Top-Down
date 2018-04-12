@@ -2,21 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class CharacterControl : MonoBehaviour
 {
 
     public GameObject downDir, upDir, leftDir, rightDir;
     public GameObject currentDir;
+    public GameObject previousDir;
     public float speed;
     public bool isWalking;
     public float horizontal, vertical;
-    public Camera cam;
     public float x, y, z;
- 
+    private TilemapInfo ti;
+    public Tilemap tilemap;
+
     // Use this for initialization
     void Start()
     {
+        ti = tilemap.GetComponent<TilemapInfo>();
 
         if (currentDir == null)
         {
@@ -39,10 +43,6 @@ public class CharacterControl : MonoBehaviour
         vertical = Input.GetAxisRaw("Vertical");
         isWalking = false;
 
-        x = cam.transform.position.x;
-        y = cam.transform.position.y;
-        z = cam.transform.position.z;
-
         moveDirection.x = horizontal;
         moveDirection.y = vertical;
 
@@ -50,6 +50,9 @@ public class CharacterControl : MonoBehaviour
             isWalking = true;
         else
             isWalking = false;
+
+        // if not moving the same direction as before, or in idling state
+        //if (!currentDir.Equals(previousDir) || currentDir.GetComponent<Animator>().GetBool("Idle"))
 
         if (horizontal < 0)
         {
@@ -82,10 +85,6 @@ public class CharacterControl : MonoBehaviour
                 currentDir.SetActive(true);
                 currentDir.GetComponent<Animator>().Play(0);
                 currentDir.GetComponent<Animator>().SetBool("Idle", false);
-            }
-            else
-            {
-                currentDir = rightDir;
             }
         }
         else if (vertical < 0)
@@ -132,7 +131,17 @@ public class CharacterControl : MonoBehaviour
         }
         else
             transform.Translate(moveDirection * speed * Time.deltaTime);
+
+        previousDir = currentDir;
     }
 
+    // happens after update
+    void LateUpdate()
+    {
+        // clamps the player movement between tilemap (xMinimum + camerawidth / 2) etc
+        // using the tilemapInfo.cs script to be reusable by every scene that has different sizes.
+        transform.position = new Vector3(Mathf.Clamp(ti.target.position.x, ti.playerXmin, ti.playerXmax),
+            Mathf.Clamp(ti.target.position.y, ti.playerYmin, ti.playerYmax), 0);
+    }
 
 }
